@@ -39,3 +39,11 @@ describe("proxy: hosts y acceso", () => {
     expect((await proxy(req("/horas", "mytime.example.com", `${SESSION_COOKIE}=1.falsa`))).status).toBe(307);
   });
 });
+
+describe("proxy en Vercel", () => {
+  it("acepta automáticamente el dominio de producción del proyecto", async () => {
+    const proxy = await load({ MYTIME_ALLOWED_HOSTS: "", VERCEL_PROJECT_PRODUCTION_URL: "mytime-abc.vercel.app", MYTIME_PASSWORD: "clave", MYTIME_SESSION_SECRET: SECRET });
+    expect((await proxy(req("/acceso", "mytime-abc.vercel.app"))).headers.get("x-middleware-next")).toBe("1");
+    expect((await proxy(req("/acceso", "otro.vercel.app"))).status).toBe(403);
+  });
+});

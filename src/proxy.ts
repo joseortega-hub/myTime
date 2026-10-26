@@ -9,7 +9,12 @@ import { authConfig, SESSION_COOKIE, verifySessionToken } from "@/lib/session";
  */
 const LOCAL = new Set(["localhost", "127.0.0.1", "::1"]);
 const allowed = new Set(
-  (process.env.MYTIME_ALLOWED_HOSTS ?? "localhost,127.0.0.1")
+  [
+    process.env.MYTIME_ALLOWED_HOSTS ?? "localhost,127.0.0.1",
+    // En Vercel, el dominio de producción del propio proyecto (variable de sistema).
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "",
+  ]
+    .join(",")
     .split(",")
     .map((h) => h.trim().toLowerCase())
     .filter(Boolean),
