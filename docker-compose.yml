@@ -1,0 +1,20 @@
+# PostgreSQL local para desarrollo. Solo escucha en 127.0.0.1.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mytime-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mytime
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mytime_local_dev}
+      POSTGRES_DB: mytime
+    ports:
+      - "127.0.0.1:5544:5432"
+    volumes:
+      - mytime-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mytime"]
+      interval: 5s
+      retries: 10
+volumes:
+  mytime-pgdata:

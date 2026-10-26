@@ -1,0 +1,10 @@
+{
+  "$comment": "EJEMPLO de la estrategia 'worklog': las ausencias se registran imputando horas en una tarea fija por tipo. Sustituye las claves de marcador.",
+  "strategy": "worklog",
+  "issueKeys": {
+    "<CLAVE-TAREA-VACACIONES>": "VACATION",
+    "<CLAVE-TAREA-COMPENSADOS>": "COMPENSATORY"
+  },
+  "status": "APPROVED",
+  "fullDayMinutes": 480
+}

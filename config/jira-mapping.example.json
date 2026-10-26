@@ -1,0 +1,20 @@
+{
+  "$comment": "EJEMPLO con valores de marcador. Copia a config/jira-mapping.json (ignorado por git) y sustituye cada <...> por los datos reales de tu instancia una vez confirmados. Elige UNA estrategia.",
+  "strategy": "issue",
+  "jql": "project = <CLAVE_PROYECTO_AUSENCIAS> AND reporter = currentUser()",
+  "fields": {
+    "startDate": "<customfield_FECHA_INICIO>",
+    "endDate": "<customfield_FECHA_FIN>",
+    "absenceType": "<customfield_TIPO_AUSENCIA>"
+  },
+  "typeValues": {
+    "<Valor para vacaciones>": "VACATION",
+    "<Valor para compensado>": "COMPENSATORY"
+  },
+  "defaultType": "VACATION",
+  "statusValues": {
+    "<Estado pendiente>": "REQUESTED",
+    "<Estado aprobado>": "APPROVED",
+    "<Estado rechazado>": "REJECTED"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "mytime", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 3100, "url": "http://127.0.0.1:3100" }
+  ]
+}

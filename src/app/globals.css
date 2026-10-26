@@ -1,26 +1,267 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Sistema visual de MyTime.
+ * Fondo claro, neutros cálidos y un color principal verde azulado.
+ * Cada estado del calendario tiene un color + una forma/textura para no
+ * depender solo del color (accesibilidad).
+ */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-canvas: #f7f7f5;
+  --color-surface: #ffffff;
+  --color-ink: #1c1c1a;
+  --color-ink-soft: #57574f;
+  --color-ink-faint: #8a8a80;
+  --color-line: #e6e5df;
+  --color-line-strong: #d4d3cb;
+
+  --color-primary: #0f766e;
+  --color-primary-strong: #0b5c55;
+  --color-primary-soft: #e0f2ef;
+  --color-primary-ink: #ffffff;
+
+  /* Estados de calendario */
+  --color-holiday: #be123c;
+  --color-holiday-soft: #ffe4e8;
+  --color-approved: #15803d;
+  --color-approved-soft: #dcfce7;
+  --color-taken: #3f6212;
+  --color-taken-soft: #ecfccb;
+  --color-pending: #b45309;
+  --color-pending-soft: #fef3c7;
+  --color-rejected: #6b6b63;
+  --color-rejected-soft: #efefec;
+  --color-planned: #6d28d9;
+  --color-planned-soft: #ede9fe;
+  --color-team: #0369a1;
+  --color-team-soft: #e0f2fe;
+  --color-weekend: #f0efea;
+
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fee2e2;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+  --color-info: #0369a1;
+  --color-info-soft: #e0f2fe;
+
+  --color-hover: rgb(0 0 0 / 0.05);
+
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgb(28 28 26 / 0.04), 0 1px 1px rgb(28 28 26 / 0.03);
+  --shadow-pop: 0 12px 32px -8px rgb(28 28 26 / 0.22), 0 2px 6px rgb(28 28 26 / 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Estilos (paletas). "teal" usa los valores de @theme. ───────────── */
+
+html[data-palette="indigo"] {
+  --color-canvas: #f5f6fb;
+  --color-line: #e3e5ef;
+  --color-line-strong: #cfd3e3;
+  --color-ink: #191a24;
+  --color-ink-soft: #545770;
+  --color-primary: #4f46e5;
+  --color-primary-strong: #4338ca;
+  --color-primary-soft: #eef0ff;
+  --radius-card: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html[data-palette="terracota"] {
+  --color-canvas: #faf6f1;
+  --color-surface: #fffdfa;
+  --color-line: #ece3d8;
+  --color-line-strong: #ddd0c0;
+  --color-ink: #2a211b;
+  --color-ink-soft: #6b5d52;
+  --color-ink-faint: #9a8b7e;
+  --color-primary: #c2410c;
+  --color-primary-strong: #9a3412;
+  --color-primary-soft: #ffeddc;
+  --color-weekend: #f3ece3;
+  --radius-card: 20px;
+}
+
+html[data-palette="pizarra"] {
+  --color-canvas: #f5f6f7;
+  --color-line: #e2e5e9;
+  --color-line-strong: #cdd2d8;
+  --color-ink: #15191e;
+  --color-ink-soft: #505862;
+  --color-primary: #334155;
+  --color-primary-strong: #1e293b;
+  --color-primary-soft: #e8ebef;
+  --color-weekend: #eef0f2;
+  --radius-card: 8px;
+  --shadow-card: none;
+}
+
+html[data-palette="contraste"] {
+  --color-canvas: #ffffff;
+  --color-ink: #000000;
+  --color-ink-soft: #262626;
+  --color-ink-faint: #4a4a4a;
+  --color-line: #8a8a8a;
+  --color-line-strong: #4d4d4d;
+  --color-primary: #0b3d91;
+  --color-primary-strong: #072b66;
+  --color-primary-soft: #dbe7ff;
+  --color-weekend: #ececec;
+  --radius-card: 10px;
+}
+
+/* ── Modo oscuro (común a todos los estilos) ───────────────────────── */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --color-canvas: #121413;
+  --color-surface: #1b1e1d;
+  --color-ink: #ecebe6;
+  --color-ink-soft: #b4b3ab;
+  --color-ink-faint: #85857c;
+  --color-line: #2c302e;
+  --color-line-strong: #3d423f;
+  --color-weekend: #202322;
+  --color-hover: rgb(255 255 255 / 0.06);
+
+  --color-primary: #2dd4bf;
+  --color-primary-strong: #5eead4;
+  --color-primary-soft: #0f2e2b;
+  --color-primary-ink: #042f2c;
+
+  --color-holiday: #fb7185;
+  --color-holiday-soft: #3b1620;
+  --color-approved: #4ade80;
+  --color-approved-soft: #12301f;
+  --color-taken: #a3e635;
+  --color-taken-soft: #253113;
+  --color-pending: #fbbf24;
+  --color-pending-soft: #3a2a0c;
+  --color-rejected: #a1a19a;
+  --color-rejected-soft: #2a2a28;
+  --color-planned: #a78bfa;
+  --color-planned-soft: #2a1f45;
+  --color-team: #38bdf8;
+  --color-team-soft: #0c2a3b;
+  --color-danger: #f87171;
+  --color-danger-soft: #3b1515;
+  --color-warning: #fbbf24;
+  --color-warning-soft: #3a2a0c;
+  --color-info: #38bdf8;
+  --color-info-soft: #0c2a3b;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-pop: 0 16px 40px -8px rgb(0 0 0 / 0.7), 0 2px 6px rgb(0 0 0 / 0.5);
+}
+
+html[data-theme="dark"][data-palette="indigo"] {
+  --color-canvas: #111219;
+  --color-surface: #1a1b26;
+  --color-line: #2a2c3d;
+  --color-line-strong: #3a3d52;
+  --color-primary: #818cf8;
+  --color-primary-strong: #a5b4fc;
+  --color-primary-soft: #1e1b4b;
+  --color-primary-ink: #0b0a2a;
+}
+
+html[data-theme="dark"][data-palette="terracota"] {
+  --color-canvas: #16120f;
+  --color-surface: #201a16;
+  --color-line: #33291f;
+  --color-line-strong: #46392c;
+  --color-weekend: #1c1713;
+  --color-primary: #fb923c;
+  --color-primary-strong: #fdba74;
+  --color-primary-soft: #3a1d0e;
+  --color-primary-ink: #2a1205;
+}
+
+html[data-theme="dark"][data-palette="pizarra"] {
+  --color-canvas: #0f1113;
+  --color-surface: #181b1f;
+  --color-line: #262b31;
+  --color-line-strong: #353c44;
+  --color-primary: #cbd5e1;
+  --color-primary-strong: #e2e8f0;
+  --color-primary-soft: #1f2933;
+  --color-primary-ink: #0f172a;
+}
+
+html[data-theme="dark"][data-palette="contraste"] {
+  --color-canvas: #000000;
+  --color-surface: #0b0b0b;
+  --color-ink: #ffffff;
+  --color-ink-soft: #e0e0e0;
+  --color-ink-faint: #bdbdbd;
+  --color-line: #777777;
+  --color-line-strong: #a8a8a8;
+  --color-weekend: #161616;
+  --color-primary: #9cc3ff;
+  --color-primary-strong: #c4dbff;
+  --color-primary-soft: #10243f;
+  --color-primary-ink: #000000;
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rechazadas: rayado diagonal para distinguirlas sin color */
+.pattern-rejected {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-rejected-soft) 0 5px,
+    var(--color-surface) 5px 9px
+  );
+}
+
+/* Propuestas del optimizador / planificadas: borde discontinuo */
+.pattern-planned {
+  background-color: var(--color-planned-soft);
+  outline: 1.5px dashed var(--color-planned);
+  outline-offset: -3px;
+}
+
+dialog::backdrop {
+  background: rgb(28 28 26 / 0.35);
+  backdrop-filter: blur(2px);
+}
+
+dialog[open] {
+  animation: dialog-in 140ms ease-out;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

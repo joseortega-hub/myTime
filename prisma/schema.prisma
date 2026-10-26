@@ -1,0 +1,417 @@
+// Modelo de datos de MyTime.
+// Las fechas de calendario se guardan como texto ISO "YYYY-MM-DD" para evitar
+// desplazamientos por zona horaria. Las marcas temporales técnicas usan DateTime.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  /// Conexión directa (sin pooler) para migraciones. En local es la misma URL.
+  directUrl = env("DIRECT_URL")
+}
+
+enum AbsenceType {
+  VACATION
+  COMPENSATORY
+  PERSONAL_DAY
+  SICK_LEAVE
+  OTHER
+}
+
+enum AbsenceStatus {
+  PLANNED
+  REQUESTED
+  APPROVED
+  TAKEN
+  REJECTED
+  CANCELLED
+}
+
+enum DayPortion {
+  FULL
+  MORNING
+  AFTERNOON
+}
+
+enum HolidayScope {
+  NATIONAL
+  REGIONAL
+  LOCAL
+  COMPANY
+}
+
+enum BalanceSource {
+  OFFICIAL
+  ESTIMATED
+  MANUAL
+}
+
+enum TeamAbsenceStatus {
+  CONFIRMED
+  TENTATIVE
+}
+
+enum EntryInputMethod {
+  MANUAL
+  TEXT
+  VOICE
+}
+
+enum WorklogSyncStatus {
+  LOCAL
+  QUEUED
+  SYNCED
+  ERROR
+}
+
+enum SyncRunStatus {
+  RUNNING
+  SUCCESS
+  PARTIAL
+  ERROR
+}
+
+/// Usuario personal. En modo personal existe una única fila.
+model UserProfile {
+  id             String        @id @default(cuid())
+  displayName    String
+  timezone       String        @default("Europe/Madrid")
+  /// Preferencias (reglas de alertas, etc.) validadas con Zod en el servidor.
+  preferences    Json          @default("{}")
+  workCalendarId String?
+  workCalendar   WorkCalendar? @relation(fields: [workCalendarId], references: [id], onDelete: SetNull)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  balances     AnnualBalance[]
+  absences     Absence[]
+  plans        Plan[]
+  scheduleDays WorkScheduleDay[]
+  compensatoryGroups CompensatoryGroup[]
+  onCallShifts       OnCallShift[]
+  workItems    WorkItem[]
+  timeEntries  TimeEntry[]
+}
+
+model WorkCalendar {
+  id              String   @id @default(cuid())
+  name            String
+  country         String?
+  region          String?
+  municipality    String?
+  /// 1 = lunes … 7 = domingo
+  workingWeekdays Int[]    @default([1, 2, 3, 4, 5])
+  /// Años cuyo listado de festivos el usuario ha confirmado como completo.
+  verifiedYears   Int[]    @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  holidays Holiday[]
+  users    UserProfile[]
+}
+
+model Holiday {
+  id         String       @id @default(cuid())
+  calendarId String
+  calendar   WorkCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+  date       String
+  name       String
+  scope      HolidayScope
+  /// Origen del dato: "manual", "import:<archivo>", ...
+  source     String       @default("manual")
+  createdAt  DateTime     @default(now())
+
+  @@unique([calendarId, date])
+}
+
+/// Horario laboral por día de la semana (módulo de horas).
+model WorkScheduleDay {
+  id           String      @id @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekday      Int
+  startTime    String
+  endTime      String
+  breakMinutes Int         @default(0)
+
+  @@unique([userId, weekday])
+}
+
+model AnnualBalance {
+  id            String        @id @default(cuid())
+  userId        String
+  user          UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year          Int
+  absenceType   AbsenceType
+  allocatedDays Float
+  carryOverDays Float         @default(0)
+  source        BalanceSource
+  notes         String?
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([userId, year, absenceType])
+}
+
+model Absence {
+  id                String        @id @default(cuid())
+  userId            String
+  user              UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              AbsenceType
+  status            AbsenceStatus
+  startDate         String
+  endDate           String
+  portion           DayPortion    @default(FULL)
+  /// Días que consume si el usuario los conoce (sustituye al cálculo).
+  daysOverride      Float?
+  notes             String?
+  /// manual | optimizer | import | jira
+  origin            String        @default("manual")
+  planId            String?
+  plan              Plan?         @relation(fields: [planId], references: [id], onDelete: SetNull)
+  externalSource    String?
+  externalId        String?
+  externalUpdatedAt DateTime?
+  lastSyncedAt      DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  events AbsenceEvent[]
+  compensatoryOption CompensatoryOption?
+
+  @@unique([externalSource, externalId])
+  @@index([userId, startDate])
+}
+
+/// Historial de cambios de estado de una ausencia.
+model AbsenceEvent {
+  id         String         @id @default(cuid())
+  absenceId  String
+  absence    Absence        @relation(fields: [absenceId], references: [id], onDelete: Cascade)
+  fromStatus AbsenceStatus?
+  toStatus   AbsenceStatus
+  note       String?
+  at         DateTime       @default(now())
+
+  @@index([absenceId])
+}
+
+/// Planificación guardada desde el optimizador (nunca crea solicitudes externas).
+model Plan {
+  id        String      @id @default(cuid())
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year      Int
+  name      String
+  objective String
+  score     Float
+  /// Resumen de bloques (fechas, métricas) tal y como se mostraron.
+  summary   Json
+  createdAt DateTime    @default(now())
+
+  absences Absence[]
+}
+
+model Team {
+  id         String   @id @default(cuid())
+  name       String
+  /// Mínimo de personas presentes deseado (cobertura).
+  minPresent Int?
+  isDemo     Boolean  @default(false)
+  source     String   @default("manual")
+  externalId String?
+  createdAt  DateTime @default(now())
+
+  members Person[]
+}
+
+/// Persona del equipo. Solo se guarda lo imprescindible para la disponibilidad.
+model Person {
+  id          String   @id @default(cuid())
+  displayName String
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  isDemo      Boolean  @default(false)
+  source      String   @default("manual")
+  externalId  String?
+  createdAt   DateTime @default(now())
+
+  absences TeamAbsence[]
+}
+
+/// Ausencia de un compañero: solo fechas y estado, sin motivos ni descripciones.
+model TeamAbsence {
+  id           String            @id @default(cuid())
+  personId     String
+  person       Person            @relation(fields: [personId], references: [id], onDelete: Cascade)
+  startDate    String
+  endDate      String
+  portion      DayPortion        @default(FULL)
+  status       TeamAbsenceStatus @default(CONFIRMED)
+  isDemo       Boolean           @default(false)
+  source       String            @default("manual")
+  externalId   String?
+  lastSyncedAt DateTime?
+  createdAt    DateTime          @default(now())
+
+  @@unique([source, externalId])
+  @@index([startDate, endDate])
+}
+
+/// Proyecto/tarea a la que se imputan horas. `jiraIssueKey` es opcional.
+model WorkItem {
+  id           String      @id @default(cuid())
+  userId       String
+  user         UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String
+  projectName  String?
+  jiraIssueKey String?
+  /// Palabras con las que lo nombras al dictar o escribir ("soporte", "daily"...)
+  aliases      String[]    @default([])
+  active       Boolean     @default(true)
+  isDemo       Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+
+  entries TimeEntry[]
+
+  @@unique([userId, label])
+}
+
+model TimeEntry {
+  id                String            @id @default(cuid())
+  userId            String
+  user              UserProfile       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              String
+  workItemId        String
+  workItem          WorkItem          @relation(fields: [workItemId], references: [id], onDelete: Restrict)
+  minutes           Int
+  description       String?
+  inputMethod       EntryInputMethod  @default(MANUAL)
+  syncStatus        WorklogSyncStatus @default(LOCAL)
+  externalWorklogId String?
+  syncError         String?
+  syncedAt          DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([userId, date])
+}
+
+/// Registro de cada sincronización con una fuente externa.
+model SyncRun {
+  id           String        @id @default(cuid())
+  provider     String
+  kind         String
+  mode         String
+  status       SyncRunStatus
+  created      Int           @default(0)
+  updated      Int           @default(0)
+  removed      Int           @default(0)
+  unchanged    Int           @default(0)
+  /// Mensaje de error saneado (sin tokens ni datos sensibles).
+  errorMessage String?
+  startedAt    DateTime      @default(now())
+  finishedAt   DateTime?
+}
+
+/// Alertas descartadas por el usuario (clave determinista de la alerta).
+model AlertDismissal {
+  key         String   @id
+  dismissedAt DateTime @default(now())
+}
+
+/// Conjunto de opciones de días compensados que ofrece la empresa
+/// (p. ej. "elige 2 de estas 5 fechas"). Se conservan todas las opciones.
+model CompensatoryGroup {
+  id        String      @id @default(cuid())
+  userId    String
+  user      UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year      Int
+  name      String
+  /// Cuántas opciones se pueden elegir (null = sin límite conocido).
+  pickCount Int?
+  notes     String?
+  createdAt DateTime    @default(now())
+
+  options CompensatoryOption[]
+
+  @@index([userId, year])
+}
+
+model CompensatoryOption {
+  id        String            @id @default(cuid())
+  groupId   String
+  group     CompensatoryGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  startDate String
+  endDate   String
+  label     String?
+  /// Ausencia creada al elegir esta opción (null = no elegida).
+  absenceId String?           @unique
+  absence   Absence?          @relation(fields: [absenceId], references: [id], onDelete: SetNull)
+  createdAt DateTime          @default(now())
+}
+
+enum OnCallKind {
+  ON_SITE
+  REMOTE
+  ON_CALL
+}
+
+enum OnCallStatus {
+  PLANNED
+  DONE
+  CANCELLED
+}
+
+enum OnCallCompensation {
+  NONE
+  PAID
+  DAYS
+  PENDING
+}
+
+/// Guardia: presencial, en remoto o localizable.
+model OnCallShift {
+  id                String             @id @default(cuid())
+  userId            String
+  user              UserProfile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate         String
+  endDate           String
+  startTime         String?
+  endTime           String?
+  kind              OnCallKind         @default(ON_CALL)
+  status            OnCallStatus       @default(PLANNED)
+  /// Horas de intervención realmente trabajadas (si las hubo).
+  workedMinutes     Int                @default(0)
+  compensation      OnCallCompensation @default(PENDING)
+  /// Días compensados que genera (si se compensa con días).
+  compensationDays  Float?
+  jiraIssueKey      String?
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([userId, startDate])
+}
+
+/// Suscripción Web Push de un dispositivo (móvil u ordenador).
+model PushSubscription {
+  id            String    @id @default(cuid())
+  endpoint      String    @unique
+  p256dh        String
+  auth          String
+  label         String?
+  failures      Int       @default(0)
+  lastSuccessAt DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+/// Avisos ya enviados (clave determinista) para no repetirlos.
+model NotificationLog {
+  key    String   @id
+  title  String
+  sentAt DateTime @default(now())
+  sent   Int      @default(0)
+}

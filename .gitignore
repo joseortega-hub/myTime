@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+!.env.example
+
+# MyTime: configuración real de Jira, exportaciones y resultados de pruebas
+config/jira-mapping.json
+/exports
+/test-results
+/playwright-report
+/playwright/.cache
+/backups
+.vercel
