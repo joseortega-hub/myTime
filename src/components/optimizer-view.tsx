@@ -65,7 +65,7 @@ export function OptimizerView({
   const comparing = result?.alternatives.filter((a) => compare.includes(a.id)) ?? [];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[340px_1fr]">
       <Card className="h-fit lg:sticky lg:top-6">
         <form onSubmit={calculate} className="space-y-4 p-5">
           <div className="grid grid-cols-2 gap-3">

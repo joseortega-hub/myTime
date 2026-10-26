@@ -135,7 +135,7 @@ export function AbsenceList({
                     id={`st-${r.id}`}
                     disabled={pending}
                     value=""
-                    className="h-8 rounded-lg border border-line-strong bg-surface px-2 text-xs"
+                    className="h-8 rounded-lg border border-line-strong bg-surface px-2 text-xs touch:h-11 touch:text-sm"
                     onChange={(e) => {
                       const s = e.target.value as AbsenceStatus;
                       if (s) void run(() => changeAbsenceStatusAction(r.id, s), { success: `Marcada como ${ABSENCE_STATUS_LABEL[s].toLowerCase()}.` });

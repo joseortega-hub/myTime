@@ -71,7 +71,7 @@ export function AppShell({ children, alertCount, jiraMode }: { children: ReactNo
     ) : null;
 
   return (
-    <div className="min-h-dvh md:pl-60">
+    <div className="min-h-dvh max-md:px-safe md:pl-60">
       <a href="#contenido" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-3 focus:py-2 focus:shadow">
         Saltar al contenido
       </a>
@@ -119,32 +119,34 @@ export function AppShell({ children, alertCount, jiraMode }: { children: ReactNo
       </aside>
 
       {/* Móvil: cabecera */}
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-2.5 border-b border-line bg-surface/90 px-4 backdrop-blur md:hidden">
+      <header className="pt-safe sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur md:hidden">
+        <div className="flex h-14 items-center gap-2.5 px-4 short:h-11">
         <span className="grid size-7 place-items-center rounded-lg bg-primary text-xs font-bold text-primary-ink">M</span>
         <p className="font-semibold">MyTime</p>
         <div className="ml-auto"><ThemeMenu placement="down" /></div>
-        <Link href="/alertas" className="relative rounded-lg p-2 text-ink-soft" aria-label={`Alertas (${alertCount})`}>
+        <Link href="/alertas" className="relative grid size-11 place-items-center rounded-lg text-ink-soft active:bg-hover" aria-label={`Alertas (${alertCount})`}>
           <Bell className="size-5" />
           {alertCount > 0 && <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-pending" />}
         </Link>
+        </div>
       </header>
 
-      <main id="contenido" className="mx-auto max-w-6xl px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-12">
+      <main id="contenido" className="mx-auto max-w-6xl px-4 pt-6 pb-28 short:pt-3 short:pb-20 md:px-8 md:pt-8 md:pb-12">
         {children}
       </main>
 
       {/* Móvil: navegación inferior */}
-      <nav aria-label="Principal móvil" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav aria-label="Principal móvil" className="px-safe fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         {NAV.filter((n) => MOBILE_PRIMARY.includes(n.href)).map(({ href, label, short, icon: Icon }) => {
           const active = isActive(pathname, href);
           return (
-            <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cx("flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium", active ? "text-primary" : "text-ink-soft")}>
+            <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cx("flex min-h-14 flex-col items-center justify-center gap-0.5 py-1.5 text-[11px] font-medium transition-transform active:scale-95 short:min-h-11 short:flex-row short:gap-1.5", active ? "text-primary" : "text-ink-soft")}>
               <Icon className="size-5" aria-hidden />
               {short ?? label}
             </Link>
           );
         })}
-        <button type="button" onClick={() => setMoreOpen(true)} className="flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium text-ink-soft" aria-expanded={moreOpen}>
+        <button type="button" onClick={() => setMoreOpen(true)} className="flex min-h-14 flex-col items-center justify-center gap-0.5 py-1.5 text-[11px] font-medium text-ink-soft transition-transform active:scale-95 short:min-h-11 short:flex-row short:gap-1.5" aria-expanded={moreOpen}>
           <MoreHorizontal className="size-5" aria-hidden />
           Más
         </button>

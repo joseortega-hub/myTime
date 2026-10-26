@@ -17,7 +17,8 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "MyTime", statusBarStyle: "default" },
 };
 
-export const viewport: Viewport = { themeColor: "#0f766e" };
+// viewport-fit=cover: la app instalada ocupa toda la pantalla; las zonas seguras se respetan con pt-safe/px-safe.
+export const viewport: Viewport = { themeColor: "#0f766e", viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

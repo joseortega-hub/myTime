@@ -72,7 +72,7 @@ export function TeamView(props: {
           «Equipo demo» y «Persona demo N» son ficticios, solo para probar la vista. No representan a compañeros reales.{" "}
           <button
             type="button"
-            className="font-medium underline"
+            className="inline-flex items-center font-medium underline touch:min-h-11"
             onClick={async () => {
               const ok = await confirm({ title: "¿Borrar los datos de demostración?", description: "Se eliminan el equipo demo, sus personas y ausencias.", confirmLabel: "Borrar", danger: true });
               if (ok) await run(() => clearDemoDataAction(), { success: "Datos de demostración eliminados." });

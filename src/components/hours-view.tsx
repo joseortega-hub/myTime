@@ -71,11 +71,11 @@ export function HoursView({ today, weekStart, week, items, jira }: { today: stri
 
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
-          <div className="flex items-center gap-1">
-            <Link href={`/horas?semana=${addDays(weekStart, -7)}`} className="rounded-lg p-2 text-ink-soft hover:bg-hover" aria-label="Semana anterior"><ChevronLeft className="size-5" /></Link>
-            <h2 className="min-w-48 text-center font-semibold">{formatRange(weekStart, addDays(weekStart, 6))}</h2>
-            <Link href={`/horas?semana=${addDays(weekStart, 7)}`} className="rounded-lg p-2 text-ink-soft hover:bg-hover" aria-label="Semana siguiente"><ChevronRight className="size-5" /></Link>
-            <Link href="/horas" className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary hover:bg-primary-soft">Esta semana</Link>
+          <div className="flex w-full items-center gap-1 sm:w-auto">
+            <Link href={`/horas?semana=${addDays(weekStart, -7)}`} className="grid size-9 place-items-center rounded-lg text-ink-soft hover:bg-hover active:bg-hover touch:size-11" aria-label="Semana anterior"><ChevronLeft className="size-5" /></Link>
+            <h2 className="min-w-0 flex-1 text-center font-semibold sm:min-w-48 sm:flex-none">{formatRange(weekStart, addDays(weekStart, 6))}</h2>
+            <Link href={`/horas?semana=${addDays(weekStart, 7)}`} className="grid size-9 place-items-center rounded-lg text-ink-soft hover:bg-hover active:bg-hover touch:size-11" aria-label="Semana siguiente"><ChevronRight className="size-5" /></Link>
+            <Link href="/horas" className="inline-flex items-center rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary hover:bg-primary-soft touch:min-h-11">Esta semana</Link>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <span className="tabular"><span className="font-semibold">{formatMinutes(weekLogged)}</span> <span className="text-ink-soft">de {formatMinutes(weekExpected)}</span></span>

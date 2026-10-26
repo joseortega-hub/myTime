@@ -52,11 +52,11 @@ const SECTIONS = [
 
 export function SettingsView(p: Props) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[200px_1fr]">
-      <nav aria-label="Secciones de ajustes" className="lg:sticky lg:top-8 lg:h-fit">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[200px_1fr]">
+      <nav aria-label="Secciones de ajustes" className="-mx-4 min-w-0 px-4 lg:sticky lg:top-8 lg:mx-0 lg:h-fit lg:px-0">
         <ul className="flex gap-1 overflow-x-auto lg:flex-col">
           {SECTIONS.map((s) => (
-            <li key={s.id}><a href={`#${s.id}`} className="block rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap text-ink-soft hover:bg-hover hover:text-ink">{s.label}</a></li>
+            <li key={s.id}><a href={`#${s.id}`} className="flex items-center rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap text-ink-soft hover:bg-hover hover:text-ink touch:min-h-11">{s.label}</a></li>
           ))}
         </ul>
       </nav>
@@ -316,14 +316,15 @@ function ScheduleSection({ schedule }: { schedule: ScheduleDay[] }) {
         }}
       >
         {days.map((d, i) => (
-          <div key={d.weekday} className="grid grid-cols-[110px_1fr_1fr_90px] items-center gap-2 text-sm sm:grid-cols-[140px_130px_130px_110px_1fr]">
-            <label className="flex items-center gap-2 capitalize">
+          <div key={d.weekday} className="grid grid-cols-3 items-center gap-2 border-b border-line pb-3 text-sm last:border-0 sm:grid-cols-[140px_130px_130px_110px_1fr] sm:border-0 sm:pb-0">
+            <label className="col-span-3 flex items-center gap-2 font-medium capitalize sm:col-span-1 sm:font-normal">
               <input type="checkbox" className="size-4 accent-[var(--color-primary)]" checked={d.enabled} onChange={(e) => set(i, { enabled: e.target.checked })} />
               {WEEKDAY_NAMES[i]}
+              {d.enabled && d.startTime < d.endTime && <span className="ml-auto text-xs font-normal text-ink-soft tabular sm:hidden">{formatMinutes(scheduledMinutes(d))}</span>}
             </label>
-            <Input aria-label={`Entrada ${WEEKDAY_NAMES[i]}`} type="time" disabled={!d.enabled} value={d.startTime} onChange={(e) => set(i, { startTime: e.target.value })} />
-            <Input aria-label={`Salida ${WEEKDAY_NAMES[i]}`} type="time" disabled={!d.enabled} value={d.endTime} onChange={(e) => set(i, { endTime: e.target.value })} />
-            <Input aria-label={`Pausa en minutos ${WEEKDAY_NAMES[i]}`} type="number" min={0} max={480} disabled={!d.enabled} value={d.breakMinutes} onChange={(e) => set(i, { breakMinutes: Number(e.target.value) })} />
+            <Input aria-label={`Entrada ${WEEKDAY_NAMES[i]}`} type="time" className="min-w-0" disabled={!d.enabled} value={d.startTime} onChange={(e) => set(i, { startTime: e.target.value })} />
+            <Input aria-label={`Salida ${WEEKDAY_NAMES[i]}`} type="time" className="min-w-0" disabled={!d.enabled} value={d.endTime} onChange={(e) => set(i, { endTime: e.target.value })} />
+            <Input aria-label={`Pausa en minutos ${WEEKDAY_NAMES[i]}`} type="number" className="min-w-0" min={0} max={480} disabled={!d.enabled} value={d.breakMinutes} onChange={(e) => set(i, { breakMinutes: Number(e.target.value) })} />
             <span className="hidden text-ink-soft tabular sm:block">{d.enabled && d.startTime < d.endTime ? formatMinutes(scheduledMinutes(d)) : "—"}</span>
           </div>
         ))}

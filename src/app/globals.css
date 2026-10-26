@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Variantes: "touch" = pantallas táctiles (dedo); "short" = móvil en horizontal. */
+@custom-variant touch (@media (pointer: coarse));
+@custom-variant short (@media (max-height: 480px) and (orientation: landscape));
+
 /*
  * Sistema visual de MyTime.
  * Fondo claro, neutros cálidos y un color principal verde azulado.
@@ -206,6 +210,38 @@ html[data-theme="dark"][data-palette="contraste"] {
 
 html {
   color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sin retardo ni doble toque para zoom en los controles. */
+a,
+button,
+input,
+select,
+textarea,
+label,
+summary {
+  touch-action: manipulation;
+}
+
+/* Táctil: casillas más grandes y su etiqueta como zona de 44 px. */
+@media (pointer: coarse) {
+  input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  label:has(> input[type="checkbox"]) {
+    min-height: 44px;
+  }
+}
+
+/* Zonas seguras (notch y barra de estado en la app instalada). Como utilidades para admitir variantes. */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility px-safe {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 body {

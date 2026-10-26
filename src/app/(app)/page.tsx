@@ -2,7 +2,7 @@ import { ArrowRight, CalendarHeart, Plane, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { STATUS_TONE } from "@/components/absence-style";
 import { NewAbsenceButton } from "@/components/new-absence-button";
-import { Badge, Card, CardHeader, EmptyState, LinkButton, Notice, PageHeader, SegmentedLinks, Stat, formatDays } from "@/components/ui";
+import { Badge, Card, CardHeader, EmptyState, LinkButton, Notice, PageHeader, SegmentedLinks, Stat, TEXT_LINK, formatDays } from "@/components/ui";
 import { ABSENCE_STATUS_LABEL, ABSENCE_TYPE_LABEL, ACTIVE_STATUSES, computeConsumption } from "@/domain/absences";
 import { BALANCE_SOURCE_LABEL, type BalanceSummary } from "@/domain/balance";
 import { calendarCompleteness, summarizePeriod } from "@/domain/calendar";
@@ -111,7 +111,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader title="Próximas ausencias" action={<Link href="/ausencias" className="text-sm font-medium text-primary hover:underline">Ver todas</Link>} />
+          <CardHeader title="Próximas ausencias" action={<Link href="/ausencias" className={TEXT_LINK}>Ver todas</Link>} />
           {upcoming.length === 0 ? (
             <EmptyState icon={<Plane className="size-5" />} title="No tienes ausencias próximas" description="Registra tus vacaciones o usa el optimizador para planificarlas." />
           ) : (
@@ -134,7 +134,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader title={`${MONTH_NAMES[m - 1][0].toUpperCase()}${MONTH_NAMES[m - 1].slice(1)} ${currentYear}`} description="Resumen del mes actual" action={<Link href={`/calendario?año=${currentYear}&mes=${m}`} className="text-sm font-medium text-primary hover:underline">Ver calendario</Link>} />
+          <CardHeader title={`${MONTH_NAMES[m - 1][0].toUpperCase()}${MONTH_NAMES[m - 1].slice(1)} ${currentYear}`} description="Resumen del mes actual" action={<Link href={`/calendario?año=${currentYear}&mes=${m}`} className={TEXT_LINK}>Ver calendario</Link>} />
           <div className="grid grid-cols-2 gap-5 p-5 sm:grid-cols-4">
             <Stat label="Días laborables" value={month.workingDays} />
             <Stat label="Quedan este mes" value={remainingWorking} hint="laborables desde hoy" />
@@ -144,14 +144,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Card>
 
         <Card>
-          <CardHeader title="Pendiente de tu atención" action={<Link href="/alertas" className="text-sm font-medium text-primary hover:underline">Alertas</Link>} />
+          <CardHeader title="Pendiente de tu atención" action={<Link href="/alertas" className={TEXT_LINK}>Alertas</Link>} />
           <div className="space-y-3 p-5 text-sm">
             <p className="flex items-center justify-between">
               <span>Solicitudes pendientes</span>
               <Badge tone={pending.length ? "warning" : "neutral"}>{pending.length}</Badge>
             </p>
             {alerts.filter((a) => a.severity !== "info").slice(0, 3).map((a) => (
-              <Link key={a.key} href={a.href} className="flex items-start gap-2 rounded-lg p-2 -mx-2 hover:bg-canvas">
+              <Link key={a.key} href={a.href} className="flex min-h-11 items-start gap-2 rounded-lg p-2 -mx-2 hover:bg-canvas active:bg-canvas">
                 <span className={`mt-1.5 size-2 shrink-0 rounded-full ${a.severity === "critical" ? "bg-danger" : "bg-pending"}`} />
                 <span>{a.title}</span>
                 <ArrowRight className="ml-auto size-4 shrink-0 text-ink-faint" aria-hidden />

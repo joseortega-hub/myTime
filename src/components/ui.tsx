@@ -13,7 +13,7 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "subtle";
 type ButtonSize = "sm" | "md";
 
 const BUTTON_BASE =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap select-none";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-[color,background-color,transform] duration-150 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap select-none";
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary: "bg-primary text-primary-ink hover:bg-primary-strong shadow-sm",
   secondary: "bg-surface text-ink border border-line-strong hover:bg-canvas",
@@ -22,8 +22,9 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   subtle: "bg-primary-soft text-primary-strong hover:brightness-95",
 };
 const BUTTON_SIZES: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-sm",
+  // En pantallas táctiles todos los botones miden al menos 44 px de alto.
+  sm: "h-8 px-3 text-sm touch:h-11 touch:min-w-11 touch:px-3.5",
+  md: "h-10 px-4 text-sm touch:h-11",
 };
 
 export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize = "md", extra?: string) {
@@ -144,14 +145,15 @@ export function Stat({ label, value, hint, tone }: { label: string; value: React
   );
 }
 
-const FIELD = "w-full rounded-lg border border-line-strong bg-surface px-3 text-sm text-ink placeholder:text-ink-faint focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:bg-canvas aria-[invalid=true]:border-danger";
+// touch:text-base: con menos de 16 px el iPhone hace zoom al tocar el campo.
+const FIELD = "w-full rounded-lg border border-line-strong bg-surface px-3 text-sm touch:text-base text-ink placeholder:text-ink-faint focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:bg-canvas aria-[invalid=true]:border-danger";
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={cx(FIELD, "h-10", className)} {...props} />;
+  return <input className={cx(FIELD, "h-10 touch:h-11", className)} {...props} />;
 }
 
 export function Select({ className, ...props }: ComponentProps<"select">) {
-  return <select className={cx(FIELD, "h-10 pr-8", className)} {...props} />;
+  return <select className={cx(FIELD, "h-10 touch:h-11 pr-8", className)} {...props} />;
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
@@ -180,7 +182,7 @@ export function SegmentedLinks({ items, label }: { items: { href: string; label:
           key={i.href}
           href={i.href}
           aria-current={i.active ? "page" : undefined}
-          className={cx("rounded-md px-3 py-1.5 text-sm font-medium transition-colors", i.active ? "bg-primary text-primary-ink" : "text-ink-soft hover:text-ink")}
+          className={cx("inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors touch:min-h-11 touch:px-4", i.active ? "bg-primary text-primary-ink" : "text-ink-soft hover:text-ink")}
         >
           {i.label}
         </Link>
@@ -188,6 +190,9 @@ export function SegmentedLinks({ items, label }: { items: { href: string; label:
     </nav>
   );
 }
+
+/** Clases para enlaces de texto sueltos ("Ver todas"): zona táctil de 44 px en móvil. */
+export const TEXT_LINK = "inline-flex items-center text-sm font-medium text-primary hover:underline touch:min-h-11";
 
 export function formatDays(n: number | null | undefined): string {
   if (n == null) return "—";

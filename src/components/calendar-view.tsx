@@ -79,28 +79,28 @@ export function CalendarView(props: {
     setForm({ type: "VACATION", status: "REQUESTED", startDate: date, endDate: date, portion: "FULL", daysOverride: null, notes: null });
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]">
       <div className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1">
+          <div className="flex w-full items-center gap-1 sm:w-auto">
             <Link
               href={view === "year" ? href(year - 1, month) : href(prev.y, prev.m)}
-              className="rounded-lg p-2 text-ink-soft hover:bg-hover"
+              className="grid size-9 place-items-center rounded-lg text-ink-soft hover:bg-hover active:bg-hover touch:size-11"
               aria-label={view === "year" ? "Año anterior" : "Mes anterior"}
             >
               <ChevronLeft className="size-5" />
             </Link>
-            <h2 className="min-w-44 text-center text-lg font-semibold capitalize" aria-live="polite">
+            <h2 className="min-w-0 flex-1 text-center text-lg font-semibold capitalize sm:min-w-44 sm:flex-none" aria-live="polite">
               {view === "year" ? year : `${MONTH_NAMES[month - 1]} ${year}`}
             </h2>
             <Link
               href={view === "year" ? href(year + 1, month) : href(next.y, next.m)}
-              className="rounded-lg p-2 text-ink-soft hover:bg-hover"
+              className="grid size-9 place-items-center rounded-lg text-ink-soft hover:bg-hover active:bg-hover touch:size-11"
               aria-label={view === "year" ? "Año siguiente" : "Mes siguiente"}
             >
               <ChevronRight className="size-5" />
             </Link>
-            <Link href={`/calendario?año=${today.slice(0, 4)}&mes=${Number(today.slice(5, 7))}${view === "year" ? "&vista=año" : ""}`} className="ml-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary hover:bg-primary-soft">
+            <Link href={`/calendario?año=${today.slice(0, 4)}&mes=${Number(today.slice(5, 7))}${view === "year" ? "&vista=año" : ""}`} className="ml-1 inline-flex items-center rounded-lg px-2.5 py-1.5 text-sm font-medium text-primary hover:bg-primary-soft touch:min-h-11">
               Hoy
             </Link>
           </div>
@@ -138,7 +138,7 @@ export function CalendarView(props: {
         </fieldset>
 
         {view === "month" ? (
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
             <div role="grid" aria-label={`Calendario de ${MONTH_NAMES[month - 1]} ${year}`}>
               <div role="row" className="grid grid-cols-7 border-b border-line bg-canvas/60 text-center text-xs font-medium text-ink-soft">
                 {WEEKDAY_SHORT.map((d) => <div role="columnheader" key={d} className="py-2">{d}</div>)}
@@ -317,7 +317,7 @@ function DayDetail({
               <select
                 id={`st-${a.id}`}
                 disabled={pending}
-                className="h-8 rounded-lg border border-line-strong bg-surface px-2 text-xs"
+                className="h-8 rounded-lg border border-line-strong bg-surface px-2 text-xs touch:h-11 touch:text-sm"
                 value=""
                 onChange={(e) => {
                   const s = e.target.value as AbsenceStatus;

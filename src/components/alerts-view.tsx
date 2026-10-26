@@ -17,7 +17,7 @@ export function AlertsView({ alerts, rules }: { alerts: (AppAlert & { dismissed:
   const dismissed = alerts.filter((a) => a.dismissed);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
       <div className="space-y-6">
         <Card>
           <CardHeader title={`Activas (${active.length})`} />
@@ -31,7 +31,7 @@ export function AlertsView({ alerts, rules }: { alerts: (AppAlert & { dismissed:
                   <li key={a.key} className="flex items-start gap-3 px-5 py-4">
                     <span className={cx("grid size-8 shrink-0 place-items-center rounded-full", TONE[a.severity])}><Icon className="size-4" aria-hidden /></span>
                     <div className="min-w-0 flex-1">
-                      <Link href={a.href} className="text-sm font-medium hover:text-primary hover:underline">{a.title}</Link>
+                      <Link href={a.href} className="inline-flex items-center text-sm font-medium hover:text-primary hover:underline touch:min-h-11">{a.title}</Link>
                       <p className="text-sm text-ink-soft">{a.description}</p>
                     </div>
                     <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => dismissAlertAction(a.key, true))}>Descartar</Button>

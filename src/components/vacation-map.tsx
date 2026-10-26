@@ -85,7 +85,7 @@ export function VacationMap(props: {
               <tr>
                 <th scope="col" className="sticky left-0 z-10 min-w-36 bg-surface px-3 py-2 text-left text-xs font-medium text-ink-soft">Mes</th>
                 {Array.from({ length: 31 }, (_, i) => (
-                  <th scope="col" key={i} className="w-7 min-w-7 px-0 py-2 text-center font-normal text-ink-faint tabular">{i + 1}</th>
+                  <th scope="col" key={i} className="w-7 min-w-7 px-0 py-2 text-center font-normal text-ink-faint tabular touch:min-w-10">{i + 1}</th>
                 ))}
               </tr>
             </thead>
@@ -132,7 +132,7 @@ export function VacationMap(props: {
                             disabled={!canAdd}
                             onClick={() => setForm({ type: "VACATION", status: state === "closed" ? "PLANNED" : "REQUESTED", startDate: d, endDate: d, portion: "FULL", daysOverride: null, notes: null })}
                             className={cx(
-                              "relative grid h-8 w-full place-items-center rounded tabular transition-transform enabled:hover:scale-110 enabled:hover:shadow",
+                              "relative grid h-8 w-full place-items-center rounded tabular touch:h-11 transition-transform enabled:hover:scale-110 enabled:hover:shadow",
                               a ? STATUS_CELL[a.status] : cls.holiday ? "bg-holiday-soft font-semibold text-holiday ring-1 ring-inset ring-holiday/40" : cls.kind === "non_working" ? "bg-weekend text-ink-faint" : STATE_CELL[state],
                               d === today && "outline-2 outline-ink",
                             )}

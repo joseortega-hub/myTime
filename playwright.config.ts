@@ -11,6 +11,7 @@ export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: false,
   workers: 1,
+  // Sin reintentos: las pruebas funcionales dependen unas de otras (modo serie).
   retries: 0,
   reporter: [["list"]],
   globalSetup: "./tests/e2e/global-setup.ts",

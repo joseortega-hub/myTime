@@ -98,7 +98,7 @@ export function ThemeMenu({ placement = "up" }: { placement?: "up" | "down" }) {
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={`Cambiar el estilo (ahora: ${current?.label ?? palette}, ${effective === "dark" ? "oscuro" : "claro"})`}
-        className="grid size-9 place-items-center rounded-lg text-ink-soft transition-colors hover:bg-hover hover:text-ink"
+        className="grid size-9 place-items-center rounded-lg text-ink-soft transition-colors hover:bg-hover hover:text-ink active:bg-hover touch:size-11"
       >
         <Palette className="size-[18px]" />
       </button>
