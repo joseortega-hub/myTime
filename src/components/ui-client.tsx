@@ -90,6 +90,11 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [confirmState, setConfirmState] = useState<(ConfirmOptions & { resolve: (v: boolean) => void }) | null>(null);
   const counter = useRef(0);
 
+  // Marca que la app ya responde a toques (lo usan las pruebas E2E para no pulsar antes de tiempo).
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = "true";
+  }, []);
+
   const toast = useCallback((t: Omit<Toast, "id">) => {
     const id = ++counter.current;
     setToasts((list) => [...list.slice(-3), { ...t, id }]);

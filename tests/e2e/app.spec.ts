@@ -22,6 +22,7 @@ test.describe.configure({ mode: "serial" });
 
 test("el inicio avisa de que falta el saldo y no inventa días disponibles", async ({ page }) => {
   await page.goto("/");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await expect(page.getByRole("heading", { name: "Tu situación" })).toBeVisible();
   await expect(page.getByText("Aún no has indicado tus días asignados")).toBeVisible();
   await expect(page.getByText(/incompleto/).first()).toBeVisible();
@@ -29,11 +30,13 @@ test("el inicio avisa de que falta el saldo y no inventa días disponibles", asy
 
 test("configurar el saldo anual y verlo en el inicio", async ({ page }) => {
   await page.goto("/ajustes#saldos");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByLabel("Días asignados").fill("23");
   await page.getByLabel("Origen del dato").selectOption("OFFICIAL");
   await page.getByRole("button", { name: "Guardar saldo" }).click();
   await toastContains(page, "Saldo guardado");
   await page.goto("/");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await expect(page.getByText("Saldo oficial confirmado")).toBeVisible();
   await expect(page.getByText("Disponibles").locator("..").getByText("23")).toBeVisible();
 });
@@ -41,6 +44,7 @@ test("configurar el saldo anual y verlo en el inicio", async ({ page }) => {
 test("crear, avisar de solapamiento y eliminar ausencias", async ({ page }) => {
   const monday = futureMonday();
   await page.goto("/ausencias");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Nueva ausencia" }).click();
   const dialog = page.getByRole("dialog", { name: "Nueva ausencia" });
   await dialog.getByLabel("Estado").selectOption("APPROVED");
@@ -64,11 +68,13 @@ test("crear, avisar de solapamiento y eliminar ausencias", async ({ page }) => {
   // El saldo descuenta solo la aprobada (si es de este año)
   if (monday.startsWith(String(year)) && plusDays(monday, 4).startsWith(String(year))) {
     await page.goto("/");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
     await expect(page.getByText("Disponibles").locator("..").getByText("18")).toBeVisible();
   }
 
   // Eliminar con confirmación
   await page.goto("/ausencias?año=todos");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Eliminar" }).first().click();
   await page.getByRole("dialog", { name: "¿Eliminar esta ausencia?" }).getByRole("button", { name: "Eliminar" }).click();
   await toastContains(page, "Ausencia eliminada");
@@ -78,16 +84,19 @@ test("crear, avisar de solapamiento y eliminar ausencias", async ({ page }) => {
 test("añadir un festivo y verlo en el calendario", async ({ page }) => {
   const day = plusDays(futureMonday(2), 2);
   await page.goto(`/ajustes?año=${day.slice(0, 4)}#calendario`);
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByLabel("Fecha", { exact: true }).fill(day);
   await page.getByLabel("Nombre", { exact: true }).last().fill("Festivo de prueba");
   await page.getByRole("button", { name: "Añadir", exact: true }).click();
   await toastContains(page, "Festivo añadido");
   await page.goto(`/calendario?año=${day.slice(0, 4)}&mes=${Number(day.slice(5, 7))}`);
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await expect(page.getByText("Festivo de prueba").first()).toBeVisible();
 });
 
 test("el optimizador propone fechas y guarda una planificación personal", async ({ page }) => {
   await page.goto("/optimizador");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByLabel("Días que quieres gastar").fill("3");
   await page.getByRole("button", { name: "Calcular propuestas" }).click();
   await expect(page.getByText(/Búsqueda exhaustiva/)).toBeVisible();
@@ -99,6 +108,7 @@ test("el optimizador propone fechas y guarda una planificación personal", async
   await toastContains(page, "Planificación guardada");
   await expect(page.getByText("Planificaciones guardadas")).toBeVisible();
   await page.goto("/ausencias?estado=PLANNED&año=todos");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await expect(page.locator("li").filter({ hasText: "Optimizador" }).first()).toBeVisible();
 });
 
@@ -106,6 +116,7 @@ test("compensados: registrar opciones, elegir una y ver las demás", async ({ pa
   const a = futureMonday(4);
   const b = plusDays(a, 7);
   await page.goto("/compensados");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Registrar opciones" }).click();
   const dialog = page.getByRole("dialog", { name: "Registrar opciones de compensados" });
   await dialog.getByLabel("Nombre").fill("Compensados de prueba");
@@ -124,6 +135,7 @@ test("compensados: registrar opciones, elegir una y ver las demás", async ({ pa
 
 test("horas: crear proyecto, interpretar texto y guardar", async ({ page }) => {
   await page.goto("/horas");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Añadir proyectos" }).click();
   const dialog = page.getByRole("dialog", { name: "Proyectos y tareas" });
   await dialog.getByLabel("Nombre").fill("Proyecto Alfa");
@@ -146,6 +158,7 @@ test("horas: crear proyecto, interpretar texto y guardar", async ({ page }) => {
 
 test("equipo: los datos de demostración están identificados", async ({ page }) => {
   await page.goto("/equipo");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Cargar datos demo" }).click();
   await toastContains(page, "Datos de demostración cargados");
   await expect(page.getByText("Estás viendo datos de demostración")).toBeVisible();
@@ -154,6 +167,7 @@ test("equipo: los datos de demostración están identificados", async ({ page })
 
 test("modo oscuro y estilo se guardan y se aplican antes de pintar", async ({ page }) => {
   await page.goto("/");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: /Cambiar el estilo/ }).first().click();
   await page.getByRole("radio", { name: /Oscuro/ }).click();
   await page.getByRole("radio", { name: /Mediterráneo/ }).click();
@@ -166,6 +180,7 @@ test("modo oscuro y estilo se guardan y se aplican antes de pintar", async ({ pa
 test("navegación móvil y teclado", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   const nav = page.getByRole("navigation", { name: "Principal móvil" });
   await expect(nav).toBeVisible();
   await nav.getByRole("button", { name: "Más" }).click();
@@ -173,6 +188,7 @@ test("navegación móvil y teclado", async ({ page }) => {
   await expect(page).toHaveURL(/compensados/);
   // En una carga completa, el primer Tab lleva al enlace para saltar al contenido.
   await page.goto("/compensados");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Saltar al contenido" })).toBeFocused();
 });
@@ -185,6 +201,7 @@ test("rechaza peticiones con un Host no permitido", async ({ request }) => {
 test("guardias: registrar una guardia y verla en próximas", async ({ page }) => {
   const day = futureMonday(1);
   await page.goto("/guardias");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await page.getByRole("button", { name: "Nueva guardia" }).first().click();
   const dialog = page.getByRole("dialog", { name: "Nueva guardia" });
   await dialog.getByLabel("Desde").fill(day);
@@ -197,6 +214,7 @@ test("guardias: registrar una guardia y verla en próximas", async ({ page }) =>
 
 test("mapa de vacaciones: muestra el plazo de 3 meses y los meses", async ({ page }) => {
   await page.goto("/vacaciones");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await expect(page.getByRole("heading", { name: "Mapa de vacaciones" })).toBeVisible();
   await expect(page.getByText(/para pedir vacaciones en/).first()).toBeVisible();
   await expect(page.getByRole("table")).toBeVisible();
@@ -205,6 +223,7 @@ test("mapa de vacaciones: muestra el plazo de 3 meses y los meses", async ({ pag
 
 test("ajustes: sección de avisos al móvil indica qué falta configurar", async ({ page }) => {
   await page.goto("/ajustes#avisos");
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
   await expect(page.getByRole("heading", { name: "Avisos en el móvil" })).toBeVisible();
   await expect(page.getByText("Falta configurar el servidor")).toBeVisible();
 });

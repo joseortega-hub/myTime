@@ -7,7 +7,7 @@
  * - sin texto cortado,
  * - altura útil para el contenido en horizontal.
  */
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const ROUTES = ["/", "/calendario", "/vacaciones", "/optimizador", "/equipo", "/ausencias", "/compensados", "/guardias", "/horas", "/alertas", "/ajustes"];
 const VIEWPORTS = [
@@ -69,11 +69,21 @@ function audit(W: number): Report {
 
 for (const vp of VIEWPORTS) {
   test.describe(`móvil ${vp.name} (${vp.width}×${vp.height})`, () => {
-    test.use({ viewport: { width: vp.width, height: vp.height }, isMobile: true, hasTouch: true });
+    // Una sola pestaña por tamaño, reutilizada en todas las pantallas: reutiliza las
+    // conexiones (keep-alive) en vez de abrir unas nuevas por prueba.
+    let page: Page;
+    test.beforeAll(async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: true, hasTouch: true, locale: "es-ES", timezoneId: "Europe/Madrid" });
+      page = await context.newPage();
+    });
+    test.afterAll(async () => {
+      await page.context().close();
+    });
 
     for (const route of ROUTES) {
-      test(`auditoría ${route}`, async ({ page }) => {
-        await page.goto(route);
+      test(`auditoría ${route}`, async () => {
+        await page.goto(route, { waitUntil: "domcontentloaded" });
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" });
         await expect(page.locator("main h1")).toBeVisible();
         await expect(page.getByText("Cargando…")).toHaveCount(0);
         // Medir con la página asentada (fuentes y peticiones terminadas).
