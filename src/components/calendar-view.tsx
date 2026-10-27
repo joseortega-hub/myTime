@@ -16,7 +16,7 @@ import { CalendarIndex, HOLIDAY_SCOPE_LABEL, summarizePeriod, type WorkCalendarR
 import { formatDate, formatRange, isIsoDate, MONTH_NAMES, monthGrid, WEEKDAY_SHORT } from "@/domain/dates";
 import { ONCALL_KIND_LABEL, type OnCallKind } from "@/domain/oncall";
 import { AbsenceFormDialog, type AbsenceFormValues } from "./absence-form";
-import { STATUS_CELL, STATUS_DOT, STATUS_TONE, TYPE_SHORT } from "./absence-style";
+import { STATUS_CELL, STATUS_DOT, STATUS_TONE, TYPE_BG, TYPE_BORDER, TYPE_SHORT, TypeLegend } from "./absence-style";
 import { Badge, Button, Card, DemoBadge, Field, Input, Notice, SegmentedLinks, cx, formatDays } from "./ui";
 import { useAction, useConfirm } from "./ui-client";
 
@@ -136,6 +136,7 @@ export function CalendarView(props: {
             </label>
           ))}
         </fieldset>
+        <TypeLegend />
 
         {view === "month" ? (
           <Card className="overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
@@ -173,8 +174,9 @@ export function CalendarView(props: {
                         </span>
                         {showHoliday && <span className="truncate text-[10px] leading-tight font-medium text-holiday">{cls.holiday!.name}</span>}
                         {dayAbs.slice(0, 2).map((a) => (
-                          <span key={a.id} className={cx("truncate rounded px-1 text-[10px] leading-4 font-medium", STATUS_CELL[a.status])}>
-                            {TYPE_SHORT[a.type]} · {ABSENCE_STATUS_LABEL[a.status]}
+                          <span key={a.id} title={`${ABSENCE_TYPE_LABEL[a.type]} · ${ABSENCE_STATUS_LABEL[a.status]}`} className={cx("truncate rounded border-l-[3px] px-1 text-[10px] leading-4 font-medium", STATUS_CELL[a.status], TYPE_BORDER[a.type])}>
+                            <span className="sm:hidden">{TYPE_SHORT[a.type]}</span>
+                            <span className="max-sm:hidden">{ABSENCE_TYPE_LABEL[a.type]}</span> · {ABSENCE_STATUS_LABEL[a.status]}
                             {a.portion !== "FULL" && " ½"}
                           </span>
                         ))}
@@ -217,7 +219,8 @@ export function CalendarView(props: {
                           type="button"
                           key={date}
                           onClick={() => setSelected(date)}
-                          aria-label={formatDate(date, "long")}
+                          aria-label={`${formatDate(date, "long")}${a ? `, ${ABSENCE_TYPE_LABEL[a.type].toLowerCase()} (${ABSENCE_STATUS_LABEL[a.status].toLowerCase()})` : ""}`}
+                          title={a ? `${ABSENCE_TYPE_LABEL[a.type]} · ${ABSENCE_STATUS_LABEL[a.status]}` : undefined}
                           className={cx(
                             "tabular relative grid aspect-square place-items-center rounded text-[11px]",
                             cls.kind === "non_working" && "bg-weekend text-ink-faint",
@@ -228,6 +231,7 @@ export function CalendarView(props: {
                           )}
                         >
                           {Number(date.slice(8))}
+                          {a && <span className={cx("absolute inset-x-0.5 top-0.5 h-1 rounded-full", TYPE_BG[a.type])} aria-hidden />}
                           {team > 0 && <span className="absolute right-0.5 bottom-0.5 size-1 rounded-full bg-team" />}
                         </button>
                       );
@@ -300,7 +304,10 @@ function DayDetail({
           <div key={a.id} className="rounded-xl border border-line p-3">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-sm font-medium">{ABSENCE_TYPE_LABEL[a.type]}</p>
+                <p className="inline-flex items-center gap-1.5 text-sm font-medium">
+                  <span className={cx("size-2.5 rounded-full", TYPE_BG[a.type])} aria-hidden />
+                  {ABSENCE_TYPE_LABEL[a.type]}
+                </p>
                 <p className="text-xs text-ink-soft">
                   {formatRange(a.startDate, a.endDate)}
                   {a.portion !== "FULL" && ` · ${DAY_PORTION_LABEL[a.portion]}`}

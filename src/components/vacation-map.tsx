@@ -7,7 +7,7 @@ import { CalendarIndex, type WorkCalendarRules } from "@/domain/calendar";
 import { daysInMonth, diffDays, formatDate, isoWeekday, makeIso, monthOf, MONTH_NAMES, WEEKDAY_SHORT, yearOf } from "@/domain/dates";
 import { addMonths, dayRequestState, monthDeadline, requestDeadline, type ClosingWindow, type DayRequestState } from "@/domain/deadlines";
 import { AbsenceFormDialog, type AbsenceFormValues } from "./absence-form";
-import { STATUS_CELL } from "./absence-style";
+import { STATUS_CELL, TYPE_BG, TypeLegend } from "./absence-style";
 import { Badge, Card, LinkButton, Notice, cx, formatDays } from "./ui";
 
 export interface MapAbsence {
@@ -76,6 +76,7 @@ export function VacationMap(props: {
         <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-team" /> Equipo ausente</span>
         <LinkButton href="/optimizador" size="sm" variant="subtle" className="ml-auto"><Sparkles className="size-4" /> Optimizar</LinkButton>
       </div>
+      <TypeLegend className="-mt-3" />
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
@@ -138,6 +139,7 @@ export function VacationMap(props: {
                             )}
                           >
                             <span aria-hidden>{WEEKDAY_SHORT[isoWeekday(d) - 1]}</span>
+                            {a && <span className={cx("absolute inset-x-0.5 top-0.5 h-1 rounded-full", TYPE_BG[a.type])} aria-hidden />}
                             {team > 0 && <span className="absolute right-0.5 bottom-0.5 size-1.5 rounded-full bg-team" aria-hidden />}
                           </button>
                         </td>

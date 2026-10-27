@@ -44,6 +44,13 @@
   --color-team-soft: #e0f2fe;
   --color-weekend: #f0efea;
 
+  /* Tipos de ausencia (franja de color, independiente del estado) */
+  --color-type-vacation: #0d9488;
+  --color-type-compensatory: #c026d3;
+  --color-type-personal: #2563eb;
+  --color-type-sick: #dc2626;
+  --color-type-other: #78716c;
+
   --color-danger: #b91c1c;
   --color-danger-soft: #fee2e2;
   --color-warning: #b45309;
@@ -148,6 +155,11 @@ html[data-theme="dark"] {
   --color-planned-soft: #2a1f45;
   --color-team: #38bdf8;
   --color-team-soft: #0c2a3b;
+  --color-type-vacation: #2dd4bf;
+  --color-type-compensatory: #e879f9;
+  --color-type-personal: #60a5fa;
+  --color-type-sick: #f87171;
+  --color-type-other: #a8a29e;
   --color-danger: #f87171;
   --color-danger-soft: #3b1515;
   --color-warning: #fbbf24;
